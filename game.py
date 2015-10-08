@@ -23,7 +23,7 @@ def play(room_id, token, server, debug=False):
     Connect to game server and play rounds in the loop until end of game.
     """
     # connect to the game server
-    client = http.client.HTTPConnection(server, 8080)
+    client = http.client.HTTPConnection(server)
     client.connect()
 
     # wait until the game starts

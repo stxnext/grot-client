@@ -5,6 +5,7 @@ GROT game command line client.
 import argparse
 import json
 import os.path
+import time
 
 from urllib.error import HTTPError
 from urllib.request import urlopen, Request
@@ -127,6 +128,7 @@ Use 'python3 client.py save token' before using other commands.
                 'max_players': max_players,
                 'auto_start': auto_start,
                 'auto_restart': auto_restart,
+                'with_bot': with_bot,
                 'token': token,
             }
             data = json.dumps(data).encode('utf8')
@@ -173,6 +175,8 @@ Use 'python3 client.py save token' before using other commands.
             start_room(args.room_id)
 
         elif subcmd == 'join':
+            room_url = 'http://{}/games/{}'.format(SERVER, args.room_id)
+            print('Check game results {}'.format(room_url))
             game.play(args.room_id, token, SERVER, args.debug)
 
         elif subcmd == 'play_devel':
@@ -181,11 +185,17 @@ Use 'python3 client.py save token' before using other commands.
         elif subcmd == 'play_vs_bot':
             room_id = new_room(
                 max_players=2,
-                auto_start=None,
+                auto_start=1,
                 auto_restart=None,
                 with_bot=True,
             )
+            room_url = 'http://{}/games/{}'.format(SERVER, room_id)
+            print('Check game results {}'.format(room_url))
             try:
                 game.play(room_id, token, SERVER, args.debug)
+                print('Results will be removed soon. Check it now {}'.format(
+                    room_url
+                ))
+                time.sleep(60)
             finally:
                 remove_room(room_id)
