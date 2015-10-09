@@ -18,16 +18,19 @@ def get_move(data):
     }
 
 
-def play(room_id, token, server, debug=False):
+def play(room_id, token, server, debug=False, alias=''):
     """
     Connect to game server and play rounds in the loop until end of game.
     """
     # connect to the game server
     client = http.client.HTTPConnection(server)
     client.connect()
+    game_url = '/games/{}/board?token={}'.format(room_id, token)
+    if alias:
+        game_url += '&alias={}'.format(alias)
 
     # wait until the game starts
-    client.request('GET', '/games/{}/board?token={}'.format(room_id, token))
+    client.request('GET', game_url)
 
     response = client.getresponse()
 
@@ -39,9 +42,6 @@ def play(room_id, token, server, debug=False):
             time.sleep(3)
 
         # make your move and wait for a new round
-        client.request(
-            'POST', '/games/{}/board?token={}'.format(room_id, token),
-            json.dumps(get_move(data))
-        )
+        client.request('POST', game_url, json.dumps(get_move(data)))
 
         response = client.getresponse()

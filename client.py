@@ -60,8 +60,19 @@ parser_new_room.add_argument(
     help='Maximum players in the room'
 )
 parser_new_room.add_argument(
+    '--allow-multi', default=False, required=False, action='store_true',
+    help='Allow users to connect multiple time with the same token'
+)
+auto_start_group = parser_new_room.add_mutually_exclusive_group(
+    required=False
+)
+auto_start_group.add_argument(
     '--auto-start', default=5, required=False, type=int, metavar='X',
     help='Automatically start game after X minutes'
+)
+auto_start_group.add_argument(
+    '--no-auto-start', default=False, required=False, action='store_true',
+    dest='no_start', help='Game can be started only manually.'
 )
 auto_restart_group = parser_new_room.add_mutually_exclusive_group(
     required=False
@@ -72,7 +83,7 @@ auto_restart_group.add_argument(
 )
 auto_restart_group.add_argument(
     '--no-auto-restart', default=False, required=False, action='store_true',
-    dest='no_auto', help='Never restart game, show results forever'
+    dest='no_restart', help='Never restart game, show results forever'
 )
 
 parser_remove = add_parser('remove')
@@ -83,7 +94,10 @@ parser_start.add_argument('room_id', help='Room ID')
 
 parser_join = add_parser('join')
 parser_join.add_argument('room_id', help='Room ID')
-
+parser_join.add_argument(
+    '--alias', required=False,
+    help='Added to your name displayed on results page.'
+)
 parser_play_devel = add_parser('play_devel')
 
 parser_play_vs_bot = add_parser('play_vs_bot')
@@ -121,7 +135,7 @@ Use 'python3 client.py save token' before using other commands.
 
     if token:
         def new_room(title=None, board_size=5, max_players=15, auto_start=5,
-                     auto_restart=5, with_bot=False):
+                     auto_restart=5, with_bot=False, allow_multi=False):
             data = {
                 'title': title,
                 'board_size': board_size,
@@ -129,6 +143,7 @@ Use 'python3 client.py save token' before using other commands.
                 'auto_start': auto_start,
                 'auto_restart': auto_restart,
                 'with_bot': with_bot,
+                'allow_multi': allow_multi,
                 'token': token,
             }
             data = json.dumps(data).encode('utf8')
@@ -163,8 +178,9 @@ Use 'python3 client.py save token' before using other commands.
                 title=args.title,
                 board_size=args.board_size,
                 max_players=args.max_players,
-                auto_start=args.auto_start,
-                auto_restart=None if args.no_auto else args.auto_restart
+                auto_start=None if args.no_start else args.auto_start,
+                auto_restart=None if args.no_restart else args.auto_restart,
+                allow_multi=args.allow_multi
             )
             print('New game room_id is {}'.format(room_id))
 
@@ -177,7 +193,7 @@ Use 'python3 client.py save token' before using other commands.
         elif subcmd == 'join':
             room_url = 'http://{}/games/{}'.format(SERVER, args.room_id)
             print('Check game results {}'.format(room_url))
-            game.play(args.room_id, token, SERVER, args.debug)
+            game.play(args.room_id, token, SERVER, args.debug, args.alias)
 
         elif subcmd == 'play_devel':
             game.play('000000000000000000000000', token, SERVER, debug=True)
