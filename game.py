@@ -9,7 +9,7 @@ import time
 
 
 def get_move(data):
-    """a
+    """
     Get coordinates (start point) of next move.
     """
     return {
