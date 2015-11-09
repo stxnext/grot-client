@@ -5,7 +5,6 @@ GROT game command line client.
 import argparse
 import json
 import os.path
-import time
 
 from urllib.error import HTTPError
 from urllib.request import urlopen, Request
@@ -23,6 +22,7 @@ _HELP = {
     'remove': 'Remove game room',
     'start': 'Start game',
     'join': 'Join game room and wait for start',
+    'results': 'Show game results',
     'play_devel': 'Play one move in loop (development mode)',
     'play_vs_bot': 'Play full game against STX Bot',
 }
@@ -98,6 +98,10 @@ parser_join.add_argument(
     '--alias', required=False,
     help='Added to your name displayed on results page.'
 )
+
+parser_results = add_parser('results')
+parser_results.add_argument('room_id', help='Room ID')
+
 parser_play_devel = add_parser('play_devel')
 
 parser_play_vs_bot = add_parser('play_vs_bot')
@@ -173,6 +177,18 @@ Use 'python3 client.py save token' before using other commands.
             )
             return urlopen(req, timeout=5)
 
+        def show_results(room_id):
+            req = Request(
+                url='http://{}/games/{}/players/?token={}'.format(
+                    SERVER, room_id, token
+                ),
+                headers = {'Accept': 'application/json'},
+            )
+            data = json.loads(urlopen(req, timeout=5).read().decode('utf8'))
+            for i, player in enumerate(data['players']):
+                print('{}. {} - {}'.format(
+                    i + 1, player['name'], player['score']))
+
         if subcmd == 'new_room':
             room_id = new_room(
                 title=args.title,
@@ -194,6 +210,10 @@ Use 'python3 client.py save token' before using other commands.
             room_url = 'http://{}/games/{}'.format(SERVER, args.room_id)
             print('Check game results {}'.format(room_url))
             game.play(args.room_id, token, SERVER, args.debug, args.alias)
+            show_results(args.room_id)
+
+        elif subcmd == 'results':
+            show_results(args.room_id)
 
         elif subcmd == 'play_devel':
             game.play('000000000000000000000000', token, SERVER, debug=True)
@@ -205,13 +225,8 @@ Use 'python3 client.py save token' before using other commands.
                 auto_restart=None,
                 with_bot=True,
             )
-            room_url = 'http://{}/games/{}'.format(SERVER, room_id)
-            print('Check game results {}'.format(room_url))
             try:
                 game.play(room_id, token, SERVER, args.debug)
-                print('Results will be removed soon. Check it now {}'.format(
-                    room_url
-                ))
-                time.sleep(60)
+                show_results(room_id)
             finally:
                 remove_room(room_id)
