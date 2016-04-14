@@ -3,7 +3,7 @@
 ## Token
 
 To play GROT you have to sign in with GitHub account on
-[GROT game server](https://grot-server.games.stxnext.com).
+[GROT game server](http://grot-server.games.stxnext.com).
 After sign in you will get token that you have to register in game client.
 
 ## Instalation
@@ -40,7 +40,7 @@ Create your onw room
 python3 client.py new_room --max-players=10
 ```
 
-Or find `<room_id>` on [/games](https://grot-server.games.stxnext.com/games).
+Or find `<room_id>` on [/games](http://grot-server.games.stxnext.com/games).
 
 Join game
 ```
@@ -54,7 +54,7 @@ Room owner can start game manually
 python3 client.py start <room_id>
 ```
 
-Check results [/games/room_id](https://grot-server.games.stxnext.com/games/<room_id>).
+Check results [/games/room_id](http://grot-server.games.stxnext.com/games/<room_id>).
 
 
 ## Sample response
