@@ -123,7 +123,7 @@ elif subcmd == 'help':
 elif subcmd == 'register':
     with open(TOKEN_FILE, 'w') as f:
         f.write(args.token)
-    print('Token has been saved.')
+    print('Token have been saved.')
 
 else:
     try:
