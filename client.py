@@ -179,7 +179,7 @@ Use 'python3 client.py save token' before using other commands.
 
         def show_results(room_id):
             req = Request(
-                url='http://{}/games/{}/players/?token={}'.format(
+                url='http://{}/games/{}/results/?token={}'.format(
                     SERVER, room_id, token
                 ),
                 headers = {'Accept': 'application/json'},
