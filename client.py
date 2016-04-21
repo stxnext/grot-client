@@ -48,7 +48,7 @@ parser_register.add_argument('token')
 
 parser_new_room = add_parser('new_room')
 parser_new_room.add_argument(
-    '--title', required=False,
+    '--title', required=True,
     help='Room title'
 )
 parser_new_room.add_argument(
@@ -175,7 +175,7 @@ Use 'python3 client.py save token' before using other commands.
                 ),
                 method='DELETE'
             )
-            return urlopen(req, timeout=5)
+            return urlopen(req, timeout=60)
 
         def show_results(room_id):
             req = Request(
@@ -184,10 +184,10 @@ Use 'python3 client.py save token' before using other commands.
                 ),
                 headers = {'Accept': 'application/json'},
             )
-            data = json.loads(urlopen(req, timeout=5).read().decode('utf8'))
+            data = json.loads(urlopen(req, timeout=60).read().decode('utf8'))
             for i, player in enumerate(data['players']):
                 print('{}. {} - {}'.format(
-                    i + 1, player['name'], player['score']))
+                    i + 1, player['login'], player['score']))
 
         if subcmd == 'new_room':
             room_id = new_room(
